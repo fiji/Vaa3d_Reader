@@ -29,6 +29,13 @@
 		</dependency>
 	</dependencies>
 
+	<scm>
+		<connection>scm:git:git://github.com/fiji/Vaa3d_Reader</connection>
+		<developerConnection>scm:git:git@github.com:fiji/Vaa3d_Reader</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/fiji/Vaa3d_Reader</url>
+	</scm>
+
 	<repositories>
 		<!-- NB: for project parent, in case of partial checkout -->
 		<repository>
