@@ -25,7 +25,6 @@
 		<dependency>
 			<groupId>sc.fiji</groupId>
 			<artifactId>fiji-lib</artifactId>
-			<version>${fiji-lib.version}</version>
 		</dependency>
 	</dependencies>
 
