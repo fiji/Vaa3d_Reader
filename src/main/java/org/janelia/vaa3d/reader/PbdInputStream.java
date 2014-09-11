@@ -27,7 +27,6 @@ package org.janelia.vaa3d.reader;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteOrder;
 
 /**
  * Base class for Pbd8InputStream and Pbd16InputStream.
@@ -56,24 +55,6 @@ public class PbdInputStream extends FilterInputStream
 	}
 	protected State state = State.STATE_BEGIN;
 	protected int leftToFill = 0; // How many bytes left in the current run
-
-	/**
-	 * Factory method to create a PbdInputStream with a particular bit-depth
-	 * byte order.
-	 * 
-	 * @param in
-	 * @param bytesPerPixel
-	 * @param byteOrder
-	 * @return
-	 */
-	public static PbdInputStream createPbdInputStream(InputStream in, int bytesPerPixel, ByteOrder byteOrder)
-	{
-		if (bytesPerPixel == 1)
-			return new Pbd8InputStream(in);
-		else if (bytesPerPixel == 2)
-			return new Pbd16InputStream(in, byteOrder);
-		throw new IllegalArgumentException("Unsupported bytes per pixel "+bytesPerPixel);
-	}
 
 	/** 
 	 * Protected constructor to encourage use of createPbdInputStream factory.
