@@ -60,6 +60,9 @@ public class Pbd16InputStream extends PbdInputStream
 	// private byte ooooollo = 6;
 	private byte ooooolll = 7;
 
+	// TODO - Suppose read method requests an odd number of bytes?
+	private boolean STUCK_IN_MID_SHORT = false;
+	// TODO - Suppose read method ends mid-difference run?
 	
 	public Pbd16InputStream(InputStream in, ByteOrder byteOrder) {
 		super(in);
@@ -97,6 +100,11 @@ public class Pbd16InputStream extends PbdInputStream
 			{
 				// Read one byte
 				int code = in.read(); // unsigned
+				if (code < 0) { // read failed, end of stream?
+				    if (out.position() == 0) // nothing has been read
+				        return code;
+				    break;
+				}
 				assert(code >= 0);
 				if (code < 32) { // literal 0-31
 					state = State.STATE_LITERAL;

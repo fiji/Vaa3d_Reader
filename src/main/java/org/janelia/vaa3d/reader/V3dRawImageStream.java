@@ -104,6 +104,10 @@ public class V3dRawImageStream
 		return endian;
 	}
 	
+	public InputStream getDataInputStream() {
+	    return inStream;
+	}
+	
 	/**
 	 * 
 	 * @param index Zero(0) for x-axis, 1 for y-axis, 2 for z-axis, 3 for color channel.
