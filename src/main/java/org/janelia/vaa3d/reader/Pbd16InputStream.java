@@ -29,6 +29,9 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.Stack;
 
 /**
  * Decompresses a binary InputStream using Sean Murphy's fast PBD 
@@ -63,6 +66,7 @@ public class Pbd16InputStream extends PbdInputStream
 	// TODO - Suppose read method requests an odd number of bytes?
 	private boolean STUCK_IN_MID_SHORT = false;
 	// TODO - Suppose read method ends mid-difference run?
+	private Queue<Short> differenceCache = new ArrayDeque<Short>();
 	
 	public Pbd16InputStream(InputStream in, ByteOrder byteOrder) {
 		super(in);
@@ -242,6 +246,9 @@ public class Pbd16InputStream extends PbdInputStream
 	                }					
 					decompressionPrior = out.get(out.position() - 1);
 				}
+                while ( out.hasRemaining() && (! differenceCache.isEmpty()) ) {
+                    out.put((short)differenceCache.poll());
+                }
 				decompressionPrior = out.get(out.position() - 1);
 				if (leftToFill < 1)
 					state = State.STATE_BEGIN;
