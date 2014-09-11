@@ -47,9 +47,15 @@ import java.util.Deque;
 public class Pbd16InputStream extends PbdInputStream 
 {
 	private ByteOrder byteOrder= ByteOrder.BIG_ENDIAN;
-	private byte[] bytes = new byte[2];
-	private ByteBuffer nibbleByteBuffer = ByteBuffer.wrap(bytes);
+	
+	private byte[] nibbleBytes = new byte[2];
+	private ByteBuffer nibbleByteBuffer = ByteBuffer.wrap(nibbleBytes);
 	private ShortBuffer nibbleShortBuffer;
+	
+    private byte[] singleShortBytes = new byte[2];
+    private ByteBuffer singleShortByteBuffer = ByteBuffer.wrap(singleShortBytes);
+    private ShortBuffer singleShortShortBuffer;
+    
 	private short repeatValue;
 	private short decompressionPrior;
 	private byte d0,d1,d2,d3;
@@ -74,6 +80,9 @@ public class Pbd16InputStream extends PbdInputStream
 		this.byteOrder = byteOrder;
 		nibbleByteBuffer.order(byteOrder);
 		nibbleShortBuffer = nibbleByteBuffer.asShortBuffer();
+		
+        singleShortByteBuffer.order(byteOrder);
+        singleShortShortBuffer = singleShortByteBuffer.asShortBuffer();
 	}
 
 	// for debugging
@@ -97,11 +106,12 @@ public class Pbd16InputStream extends PbdInputStream
 		
 		int bytesRead = 0;
 		
+		// Second half-short
 		// Is there a leftover byte (half-short) from last time?
 		int off, len;
 		if (haveCachedNibble) {
 		    // Write one byte to output
-		    b[off0] = bytes[1];
+		    b[off0] = nibbleBytes[1];
 		    off = off0 + 1;
 		    len = len0 - 1;
 		    haveCachedNibble = false;
@@ -119,8 +129,18 @@ public class Pbd16InputStream extends PbdInputStream
 		ShortBuffer out = byteOut.asShortBuffer();
 		
         int shortValue = getNextShort();
+        
         if ( (shortValue < 0) && (bytesRead == 0) )
             return shortValue; // -1 means read failed
+        
+        // Special case for read of length 1
+        if ( !out.hasRemaining() ) {
+            if ( cacheNibble(shortValue) ) {
+                b[off0 + len0 - 1] = nibbleBytes[0];
+                bytesRead += 1;
+            }
+        }
+        
         while ( out.hasRemaining() && (shortValue >= 0) )
         {
             out.put((short)shortValue);
@@ -128,8 +148,36 @@ public class Pbd16InputStream extends PbdInputStream
             if (out.hasRemaining())
                 shortValue = getNextShort();
         }
+        
+        // First half-short
+        // Sometimes we might have room for just one more byte,
+        // the first byte of a two-byte short
+        if ((len0 - bytesRead) == 1) {
+            shortValue = getNextShort();
+            if ( cacheNibble(shortValue) ) {
+                b[off0 + len0 - 1] = nibbleBytes[0];
+                bytesRead += 1;
+            }
+        }
 		
 		return bytesRead;
+	}
+	
+	/** Save one short data value that must be divided between two read calls
+	 * 
+	 * @param value
+	 * @return number of bytes read
+	 */
+	private boolean cacheNibble(int value) {
+	    if (value < 0) {
+	        haveCachedNibble = false;
+	        return false; // don't cache invalid values
+	    }
+        nibbleShortBuffer.rewind();
+        nibbleShortBuffer.put((short)value);
+        // b[off0 + len0 - 1] = nibbleBytes[0];
+        haveCachedNibble = true;
+	    return true;
 	}
 	
 	/**
@@ -163,16 +211,15 @@ public class Pbd16InputStream extends PbdInputStream
                 else { // Repeat 223-255
                     state = State.STATE_REPEAT;
                     leftToFill = code - 222;
-                    in.read(bytes, 0, 2);
-                    nibbleShortBuffer.rewind();
-                    repeatValue = nibbleShortBuffer.get();
+                    in.read(singleShortBytes, 0, 2);
+                    repeatValue = singleShortShortBuffer.get(0);
                 }
             }
             else if (state == State.STATE_LITERAL)
             {
                 for (int s = 0; s < leftToFill; ++s) {
-                    in.read(bytes, 0, 2);
-                    short value = nibbleShortBuffer.get(0);
+                    in.read(singleShortBytes, 0, 2);
+                    short value = singleShortShortBuffer.get(0);
                     shortValueCache.add(value);
                 }
                 state = State.STATE_BEGIN;
