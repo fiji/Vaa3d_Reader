@@ -5,3 +5,5 @@
 
 # Maven #
 /target/
+/.metadata
+/bin/org/janelia/vaa3d/reader/*.class

@@ -26,8 +26,11 @@ package org.janelia.vaa3d.reader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.zip.DataFormatException;
 
 /*
@@ -86,7 +89,7 @@ public class V3dRawImageStream
 	public V3dRawImageStream(InputStream input) {
 		inStream = input;
 		try {
-			loadHeader();
+			loadHeader(input);
 		}
 		catch (IOException exc) {
 			throw new IllegalArgumentException(exc);
@@ -102,6 +105,10 @@ public class V3dRawImageStream
 	 */
 	public ByteOrder getByteOrder() {
 		return endian;
+	}
+	
+	public InputStream getDataInputStream() {
+	    return inStream;
 	}
 	
 	/**
@@ -121,13 +128,43 @@ public class V3dRawImageStream
 		return pixelBytes;
 	}
 	
-	private void loadHeader() 
+	public void writeHeader(OutputStream headerOutputStream, Format v3dFormat) 
+	        throws IOException 
+	{
+        byte[] buffer0 = new byte[4];
+        ByteBuffer buffer = ByteBuffer.wrap(buffer0);
+        buffer.order(endian);
+        ShortBuffer shortBuffer = buffer.asShortBuffer();
+        IntBuffer intBuffer = buffer.asIntBuffer();
+
+        // file format description
+	    headerOutputStream.write(V3DRAW_MAGIC_COOKIE[v3dFormat.ordinal()].getBytes(), 0, 24); // 24
+	    
+	    // endian
+	    if (endian == ByteOrder.BIG_ENDIAN)
+	        headerOutputStream.write("B".getBytes(), 0, 1); // 25
+	    else
+            headerOutputStream.write("L".getBytes(), 0, 1); // 25
+	    
+	    // bytes per pixel - two bytes
+	    shortBuffer.rewind();
+	    shortBuffer.put((short)pixelBytes);
+	    headerOutputStream.write(buffer0, 0, 2); // 27 bytes total
+	    
+	    for (int dim: dimensions) { // *4
+	        intBuffer.rewind();
+	        intBuffer.put(dim);
+	        headerOutputStream.write(buffer0, 0, 4); // +4
+	    } // 43 bytes total
+	}
+	
+	private void loadHeader(InputStream headerInputStream) 
 	throws IOException, DataFormatException
 	{
 		// header is 43 bytes long
 		byte[] buffer0 = new byte[43];
 		ByteBuffer buffer = ByteBuffer.wrap(buffer0);
-		inStream.read(buffer.array(), 0, 43);
+		headerInputStream.read(buffer.array(), 0, 43);
 		buffer.rewind();
 		// Parse file type header string (24 bytes)
 		headerKey = new String(buffer.array(), 0, 24);

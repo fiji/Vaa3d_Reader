@@ -110,7 +110,7 @@ public class Vaa3d_Reader extends ImagePlus implements PlugIn {
      * @param url points to the input .v3draw format volume image
      * @return <code>true</code> on success
      */
-    private boolean parse(URL url) {  
+    private boolean parse(URL url) {
         // Open file and read header
     	V3dRawImageStream sliceStream;
         try {
