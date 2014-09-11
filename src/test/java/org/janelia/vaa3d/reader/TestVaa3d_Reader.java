@@ -10,6 +10,11 @@ import org.junit.Test;
 public class TestVaa3d_Reader {
 
     @Test
+    public void testVaa3dPbdRawSameDataSmallRead() {
+        testVaa3dDataEquality("/test_strip8.v3draw", "/test_strip8.v3dpbd", 8); // fails
+    }
+    
+    @Test
     public void testPositiveControl() {
         // Does unit testing work at all?
         assertTrue(true);
@@ -39,8 +44,11 @@ public class TestVaa3d_Reader {
         assertEquals(countResourceDataBytes("/test_strip8.v3dpbd"), countResourceDataBytes("/test_strip8.v3draw"));
     }
     
+    /**
+     * Test case for reading one byte at a time. 
+     */
     // TODO activate this test
-    // @Test
+    @Test
     public void testVaa3dPbdRawSameDataRead1() {
         // TODO - the bare read() method for Pdb16InputStream needs work
         InputStream raw = new V3dRawImageStream(ClassLoader.class.getResourceAsStream("/test_strip8.v3draw")).getDataInputStream();
@@ -58,25 +66,19 @@ public class TestVaa3d_Reader {
     
     @Test
     public void testVaa3dPbdRawSameDataBigRead() {
-        testVaa3dDataEquality("/test_strip8.v3draw", "/test_strip8.v3dpbd", 1024); // passes
+        testVaa3dDataEquality("/test_strip8.v3draw", "/test_strip8.v3dpbd", 64); // passes
+        testVaa3dDataEquality("/testSliceDiffBoundary.v3draw", "/testSliceDiffBoundary.v3dpbd", 64000); // passes   
     }
 
-    @Test
-    public void testVaa3dPbdRawSameDataSmallRead() {
-        testVaa3dDataEquality("/test_strip8.v3draw", "/test_strip8.v3dpbd", 8); // fails
-    }
-    
     /**
      * Tests data error investigated September 2014.
      * Where Vaa3D_PBD format 16-bit images that cross a slice boundary are not parsed correctly.
      */
-    // TODO activate this test
-    // @Test
+    @Test
     public void testPbd16DiffSliceBoundary() {
         // Size of buffered reads makes a difference, because problem occurs
         // when a difference run crosses a read boundary
-        testVaa3dDataEquality("/testSliceDiffBoundary.v3draw", "/testSliceDiffBoundary.v3dpbd", 64000); // passes   
-        testVaa3dDataEquality("/testSliceDiffBoundary.v3draw", "/testSliceDiffBoundary.v3dpbd", 256); // fails
+        testVaa3dDataEquality("/testSliceDiffBoundary.v3draw", "/testSliceDiffBoundary.v3dpbd", 256);
     }
     
     private void testVaa3dDataEquality(String res1, String res2, int bufSize) {

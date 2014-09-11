@@ -30,8 +30,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.util.ArrayDeque;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.Deque;
+
 
 /**
  * Decompresses a binary InputStream using Sean Murphy's fast PBD 
@@ -63,10 +63,8 @@ public class Pbd16InputStream extends PbdInputStream
 	// private byte ooooollo = 6;
 	private byte ooooolll = 7;
 
-	// TODO - Suppose read method requests an odd number of bytes?
-	private boolean STUCK_IN_MID_SHORT = false;
-	// TODO - Suppose read method ends mid-difference run?
-	private Queue<Short> differenceCache = new ArrayDeque<Short>();
+	// differenceCache is used in case read method ends mid-difference run.
+	private Deque<Short> differenceCache = new ArrayDeque<Short>();
 	
 	public Pbd16InputStream(InputStream in, ByteOrder byteOrder) {
 		super(in);
@@ -143,14 +141,8 @@ public class Pbd16InputStream extends PbdInputStream
 			}
 			else if (state == State.STATE_DIFFERENCE)
 			{
-				while ( (leftToFill > 0) && out.hasRemaining() ) 
+				while (leftToFill > 0)
 				{
-					// Bug fix Aug 2013 CMB
-					// If the output buffer cannot hold 8 more values, we cannot yet unpack this set of differences.
-					int spaceNeeded = Math.min(leftToFill, 8);
-					if (out.remaining() < spaceNeeded) {
-						return 2*out.position(); // Parse these differences in the next gulp of bytes
-					}
 					//
 	                // 332
 	                d0=d1=d2=d3=0;
@@ -158,7 +150,7 @@ public class Pbd16InputStream extends PbdInputStream
 	                // sourceChar=(byte)sourceChar2;
 	                d0 = (byte)(sourceChar2 >>> 5);
 					short value = (short)(decompressionPrior+(d0<5?d0:4-d0));
-	                out.put(value);
+	                differenceCache.add(value); // out.put(value);
 	                // out.put(checkValue(value));
 	                //if (debug) qDebug() << "debug: position " << (dp-1) << " diff value=" << target16Data[dp-1] << " d0=" << d0;
 	                leftToFill--;
@@ -167,7 +159,7 @@ public class Pbd16InputStream extends PbdInputStream
 	                }
 	                d1 = (byte)((sourceChar2 >>> 2) & ooooolll);
 	                value = (short)(value + (d1<5?d1:4-d1));
-	                out.put(value);
+	                differenceCache.add(value); // out.put(value);
 	                // out.put(checkValue(value));
 	                //if (debug) qDebug() << "debug: position " << (dp-1) << " diff value=" << target16Data[dp-1];
 	                leftToFill--;
@@ -184,7 +176,7 @@ public class Pbd16InputStream extends PbdInputStream
 	                carryOver <<= 1;
 	                d0 = (byte)((sourceChar2 >>> 7) | carryOver);
 	                value = (short)(value + (d0<5?d0:4-d0));
-	                out.put(value);
+	                differenceCache.add(value); // out.put(value);
 	                // out.put(checkValue(value));
 	                //if (debug) qDebug() << "debug: position " << (dp-1) << " diff value=" << target16Data[dp-1];
 	                leftToFill--;
@@ -193,7 +185,7 @@ public class Pbd16InputStream extends PbdInputStream
 	                }
 	                d1 = (byte)((sourceChar2 >>> 4) & ooooolll);
 	                value = (short)(value + (d1<5?d1:4-d1));
-	                out.put(value);
+	                differenceCache.add(value); // out.put(value);
 	                // out.put(checkValue(value));
 	                //if (debug) qDebug() << "debug: position " << (dp-1) << " diff value=" << target16Data[dp-1];
 	                leftToFill--;
@@ -202,7 +194,7 @@ public class Pbd16InputStream extends PbdInputStream
 	                }
 	                d2 = (byte)((sourceChar2 >>> 1) & ooooolll);
 	                value = (short)(value + (d2<5?d2:4-d2));
-	                out.put(value);
+	                differenceCache.add(value); // out.put(value);
 	                // out.put(checkValue(value));
 	                //if (debug) qDebug() << "debug: position " << (dp-1) << " diff value=" << target16Data[dp-1];
 	                leftToFill--;
@@ -219,7 +211,7 @@ public class Pbd16InputStream extends PbdInputStream
 	                carryOver <<= 2;
 	                d0 = (byte)((sourceChar2 >>> 6) | carryOver);
 	                value = (short)(value + (d0<5?d0:4-d0));
-	                out.put(value);
+	                differenceCache.add(value); // out.put(value);
 	                // out.put(checkValue(value));
 	                //if (debug) qDebug() << "debug: position " << (dp-1) << " diff value=" << target16Data[dp-1];
 	                leftToFill--;
@@ -228,7 +220,7 @@ public class Pbd16InputStream extends PbdInputStream
 	                }
 	                d1 = (byte)((sourceChar2 >>> 3) & ooooolll);
 	                value = (short)(value + (d1<5?d1:4-d1));
-	                out.put(value);
+	                differenceCache.add(value); // out.put(value);
 	                // out.put(checkValue(value));
 	                //if (debug) qDebug() << "debug: position " << (dp-1) << " diff value=" << target16Data[dp-1];
 	                leftToFill--;
@@ -237,20 +229,26 @@ public class Pbd16InputStream extends PbdInputStream
 	                }
 	                d2 = (byte)((sourceChar2) & ooooolll);
 	                value = (short)(value + (d2<5?d2:4-d2));
-	                out.put(value);
+	                differenceCache.add(value); // out.put(value);
 	                // out.put(checkValue(value));
 	                //if (debug) qDebug() << "debug: position " << (dp-1) << " diff value=" << target16Data[dp-1];
 	                leftToFill--;
 	                if (leftToFill==0) {
 	                    break;
-	                }					
-					decompressionPrior = out.get(out.position() - 1);
+	                }
+	                // Does this statement ever get executed?
+					decompressionPrior = differenceCache.peekLast();
 				}
-                while ( out.hasRemaining() && (! differenceCache.isEmpty()) ) {
-                    out.put((short)differenceCache.poll());
-                }
-				decompressionPrior = out.get(out.position() - 1);
-				if (leftToFill < 1)
+				if (! differenceCache.isEmpty()) {
+				    decompressionPrior = differenceCache.peekLast();
+	                while ( out.hasRemaining() && (! differenceCache.isEmpty()) ) {
+	                    out.put((short)differenceCache.poll());
+	                }
+				}
+				else {
+				    decompressionPrior = out.get(out.position() - 1);
+				}
+				if ( (leftToFill < 1) && differenceCache.isEmpty() )
 					state = State.STATE_BEGIN;
 			}
 			else if (state == State.STATE_REPEAT)
