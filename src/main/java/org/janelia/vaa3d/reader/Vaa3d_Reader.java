@@ -24,15 +24,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.janelia.vaa3d.reader;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.ByteBuffer;
-
-import ij.IJ;
 import ij.CompositeImage;
+import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.NewImage;
 import ij.io.OpenDialog;
@@ -43,6 +36,13 @@ import ij.process.ByteProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ShortProcessor;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.ByteBuffer;
 
 /**
  * Vaa3d_Reader class is a Fiji/ImageJ plugin for loading 
