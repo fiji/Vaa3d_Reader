@@ -18,6 +18,25 @@
 	<name>plugins/Vaa3d_Reader.jar</name>
 	<description>Custom reader for Vaa3D application 3D volume file formats .v3draw and .v3dpbd.</description>
 
+	<scm>
+		<connection>scm:git:git://github.com/fiji/Vaa3d_Reader</connection>
+		<developerConnection>scm:git:git@github.com:fiji/Vaa3d_Reader</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/fiji/Vaa3d_Reader</url>
+	</scm>
+	<ciManagement>
+		<system>Jenkins</system>
+		<url>http://jenkins.imagej.net/job/Vaa3d_Reader/</url>
+	</ciManagement>
+
+	<repositories>
+		<!-- NB: for project parent -->
+		<repository>
+			<id>imagej.public</id>
+			<url>http://maven.imagej.net/content/groups/public</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<!-- Fiji dependencies -->
 		<dependency>
@@ -37,25 +56,5 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://jenkins.imagej.net/job/Vaa3d_Reader/</url>
-	</ciManagement>
-
-	<scm>
-		<connection>scm:git:git://github.com/fiji/Vaa3d_Reader</connection>
-		<developerConnection>scm:git:git@github.com:fiji/Vaa3d_Reader</developerConnection>
-		<tag>HEAD</tag>
-		<url>https://github.com/fiji/Vaa3d_Reader</url>
-	</scm>
-
-	<repositories>
-		<!-- NB: for project parent -->
-		<repository>
-			<id>imagej.public</id>
-			<url>http://maven.imagej.net/content/groups/public</url>
-		</repository>
-	</repositories>
 
 </project>
