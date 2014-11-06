@@ -13,21 +13,22 @@
 	</parent>
 
 	<artifactId>Vaa3d_Reader</artifactId>
-
-	<!-- NOTE: Version must be incremented with every change committed on github -->
 	<version>2.0.1-SNAPSHOT</version>
 
 	<name>plugins/Vaa3d_Reader.jar</name>
 	<description>Custom reader for Vaa3D application 3D volume file formats .v3draw and .v3dpbd.</description>
 
 	<dependencies>
-		<dependency>
-			<groupId>net.imagej</groupId>
-			<artifactId>ij</artifactId>
-		</dependency>
+		<!-- Fiji dependencies -->
 		<dependency>
 			<groupId>sc.fiji</groupId>
 			<artifactId>fiji-lib</artifactId>
+		</dependency>
+
+		<!-- ImageJ dependencies -->
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>ij</artifactId>
 		</dependency>
 
 		<dependency>
