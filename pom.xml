@@ -15,7 +15,7 @@
 	<artifactId>Vaa3d_Reader</artifactId>
 
 	<!-- NOTE: Version must be incremented with every change committed on github -->
-	<version>2.0.0</version>
+	<version>2.0.1-SNAPSHOT</version>
 
 	<name>plugins/Vaa3d_Reader.jar</name>
 	<description>Custom reader for Vaa3D application 3D volume file formats .v3draw and .v3dpbd.</description>
