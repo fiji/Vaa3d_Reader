@@ -1,4 +1,4 @@
-![](http://jenkins.imagej.net/job/Vaa3d_Reader/lastBuild/badge/icon)
+[![](http://jenkins.imagej.net/job/Vaa3d_Reader/lastBuild/badge/icon)](http://jenkins.imagej.net/job/Vaa3d_Reader/)
 
 Vaa3d_Reader
 ============
