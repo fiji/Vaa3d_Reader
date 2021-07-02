@@ -1,4 +1,4 @@
-[![](https://travis-ci.org/fiji/Vaa3d_Reader.svg?branch=master)](https://travis-ci.org/fiji/Vaa3d_Reader)
+[![](https://github.com/fiji/Vaa3d_Reader/actions/workflows/build-main.yml/badge.svg)](https://github.com/fiji/Vaa3d_Reader/actions/workflows/build-main.yml)
 
 Vaa3d_Reader
 ============

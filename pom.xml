@@ -83,8 +83,8 @@
 		<url>https://github.com/fiji/Vaa3d_Reader/issues</url>
 	</issueManagement>
 	<ciManagement>
-		<system>Travis CI</system>
-		<url>https://travis-ci.org/fiji/Vaa3d_Reader</url>
+		<system>GitHub Actions</system>
+		<url>https://github.com/fiji/Vaa3d_Reader/actions</url>
 	</ciManagement>
 
 	<properties>
@@ -94,7 +94,7 @@
 		<license.projectName>Fiji distribution of ImageJ for the life sciences.</license.projectName>
 
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
-		<releaseProfiles>deploy-to-scijava</releaseProfiles>
+		<releaseProfiles>sign,deploy-to-scijava</releaseProfiles>
 	</properties>
 
 	<repositories>
