@@ -1,5 +1,6 @@
 # Eclipse #
 /.classpath
+/.factorypath
 /.project
 /.settings/
 
@@ -7,3 +8,6 @@
 /target/
 /.metadata
 /bin/org/janelia/vaa3d/reader/*.class
+
+# IntelliJ #
+/.idea/
